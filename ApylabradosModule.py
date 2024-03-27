@@ -363,4 +363,25 @@ class Board():
                 return(False,message)
         message = "Valido"
         return (True, message)
+
+    def getPawns(self, word, x, y, direction):
+        """
+        Dice que fichas se necesitan para insertar una palabra en cierta posición y dirección
+        """
+
+        possible, message = self.isPossible(word,x,y,direction)
+        if not possible:
+            print(message)
+
+        else:
+            needed_letters = Word()
+            for c in word.word:
+                if self.board[x][y] != c:
+                    needed_letters.word.append(c)
+                if direction == "V":
+                    x += 1
+                elif direction == "H":
+                    y += 1
             
+        return needed_letters
+        
