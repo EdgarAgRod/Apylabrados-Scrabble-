@@ -1,12 +1,15 @@
 import numpy as np
-import pandas as pd
 import csv
 
 
 class Pawns():
+    points = {"A":1, "B":3, "C":3,"D":2, "E":1, "F":4, "G":2, "H":4, "I":1, 
+              "J":8, "K":5, "L":1, "M":3, "N":1, "O":1, "P":3, "Q":10, "R":1, 
+              "S":1, "T":1,"U":1, "V":4, "W":4, "X":8, "Y":4,"Z":10
+              }
     def __init__(self):
         self.letters = []
-
+        
     def addPawn(self, c):
         """
         Añade una ficha c a la lista de caracteres letters
@@ -79,10 +82,32 @@ class Pawns():
         return ft
 
     def takePawn(self, c):
+        """
+        Quita un pawn
+        """
         self.letters.remove(c)
 
     def getTotalPawns(self):
+        """ 
+        Calcula el numero de letras
+        """
         return len(self.letters)
+
+    @staticmethod
+    def getPoints(c):
+        """
+        Calcula los puntos de un caracter
+        """
+        return Pawns.points[c]
+
+    @staticmethod
+    def showPawnsPoints():
+        count = 0
+        end = "   "
+        for key in Pawns.points:
+            print("{}:{}{}".format(key," " if Pawns.getPoints(key)<=9 else "", Pawns.getPoints(key)), end = end)
+            count += 1
+            end = "\n" if count % 3 == 2 else "   "
 
 
 class Word():
@@ -260,6 +285,7 @@ class FrequencyTable():
 
 
 class Board():
+    score = 0
     def __init__ (self):
         self.board = [[" " for j in range(15)] for i in range(15)]
         self.total_words = 0
@@ -291,6 +317,7 @@ class Board():
                 self.board[x][y] =  c
                 player_pawns.takePawn(c)
                 self.total_pawns += 1
+                Board.score += Pawns.points[c]
 
             if direction == "V":
                 x += 1
@@ -423,5 +450,4 @@ class Board():
                     needed_pawns = self.getPawns(word,i,j,"H")
                     if FrequencyTable.isSubset(needed_pawns.getFrequency(), pawns.getFrequency()):
                         print(i , "," , j , "en Horizontal")
-
-          
+                      
