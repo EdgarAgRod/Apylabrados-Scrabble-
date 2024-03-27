@@ -162,7 +162,12 @@ class Word():
             ft.update(c)
 
         return ft
-    
+
+    def getLengthWord(self):
+        """
+        Devuelve la longitud de la palabra
+        """
+        return len(self.word)   
 
 class Dictionary():
     filepath = "/content/drive/MyDrive/Python - Udemy/Proyecto Final Apylabrados/dictionary.txt"
@@ -270,5 +275,92 @@ class Board():
             elif direction == "H":
                 y += 1
             
-        self.total_words += 1 
+        self.total_words += 1
 
+    def isPossible(self, word, x, y, direction):
+        """
+        Comprueba si es posible colocar la palabra en la posición y coordenadas
+        """
+        message = ""
+        size = word.getLengthWord()
+
+        # Casilla Central
+        if self.total_words == 0:
+            message = "Ninguna ficha pasa por la casilla central"
+            
+            if direction == "H":
+                if x != 7:
+                    return (False, message)
+                elif 7 not in range(y,y+size):
+                    return (False, message)
+            
+            elif direction == "V":
+                if y != 7:
+                    return (False, message)
+                elif 7 not in range(x,x+size):
+                    return (False, message)
+
+        else:
+
+        # Límites del tablero
+            message = "La palabra se sale de los límites del tablero"
+            if x<0 or x>14 or y<0 or y>14:
+                return(False, message)
+            if direction == "V" and  x+size -1 > 14:
+                return(False, message)
+            if direction == "H" and  y+size-1 > 14:
+                return(False, message)
+
+        # Ficha existente
+            message = "Debes usar una ficha existente"
+            if direction == "V":
+                for i in range(x, x+size):
+                    if self.board[i][y] != " ":
+                        break
+                else:
+                    return(False, message)
+            if direction == "H":
+                for i in range(y, y+size):
+                    if self.board[x][i] != " ":
+                        break
+                else:
+                    return(False, message)
+
+            # Casilla ocupada
+            x_copy = x
+            y_copy = y
+            for c in word.word:
+                if self.board[x_copy][y_copy] != " " and self.board[x_copy][y_copy] != c:
+                    message = "¡Ya hay una ficha distinta en una posicion que intentaste!"
+                    return(False,message)
+                if direction == "V":
+                    x_copy += 1
+                elif direction == "H":
+                    y_copy += 1
+
+            # Nueva ficha
+            x_copy = x
+            y_copy = y
+            for c in word.word:
+                if self.board[x_copy][y_copy] == " ":
+                    break;
+                if direction == "V":
+                    x_copy += 1
+                elif direction == "H":
+                    y_copy += 1
+            else: 
+                message = "No has usado una nueva casilla"
+                return(False,message)
+            
+            # No arruinar otra palabra
+            message = "Hay fichas adicionales a principio o a final de palabra"
+            size_fixed = size-1
+            
+            if direction == "V" and ((x != 0 and self.board[x-1][y] != " ") or (x + size != 14 and self.board[x + size][y] != " ")):
+                return(False,message)
+            
+            if direction == "H" and ((y != 0 and self.board[x][y-1] != " ") or (y + size != 14 and self.board[x][y+size] != " ")):
+                return(False,message)
+        message = "Valido"
+        return (True, message)
+            
