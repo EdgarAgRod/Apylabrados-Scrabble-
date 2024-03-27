@@ -257,7 +257,7 @@ class Board():
 
     def placeWord(self, player_pawns, word, x, y, direction):
         """
-        Coloca la palabra en el tablero, elimina y repone las fichas del jugador
+        Coloca la palabra en el tablero, elimina las fichas del jugador
         """
         for c in word.word:
             if self.board[x][y] != c: 
@@ -270,11 +270,5 @@ class Board():
             elif direction == "H":
                 y += 1
             
-        self.total_words += 1
-        
-        n_pawns_used = 7 - player_pawns.getTotalPawns()
-        for _ in range(n_pawns_used):
-            player_pawns.addPawn(bag_of_pawns.takeRandomPawn())
+        self.total_words += 1 
 
-        return player_pawns
-    
