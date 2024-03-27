@@ -169,6 +169,7 @@ class Word():
         """
         return len(self.word)   
 
+
 class Dictionary():
     filepath = "/content/drive/MyDrive/Python - Udemy/Proyecto Final Apylabrados/dictionary.txt"
 
@@ -193,7 +194,28 @@ class Dictionary():
             return False
         else:
             return True
-        
+
+    @staticmethod
+    def showWord(pawns):
+        with open(Dictionary.filepath, "r") as f:
+            dictionary_word = Word.readWordFromFile(f)
+            while not dictionary_word.isEmpty():
+                if FrequencyTable.isSubset(dictionary_word.getFrequency(), pawns.getFrequency()):
+                    print(dictionary_word)
+                dictionary_word = Word.readWordFromFile(f)
+
+    @staticmethod
+    def showWordPlus(pawns, c):
+        tf_pawns = pawns.getFrequency()
+        tf_pawns.update(c)
+        with open(Dictionary.filepath, "r") as f:
+            dictionary_word = Word.readWordFromFile(f)
+            while not dictionary_word.isEmpty():
+                if c in dictionary_word.word:
+                    if FrequencyTable.isSubset(dictionary_word.getFrequency(), tf_pawns):
+                        print(dictionary_word)
+                dictionary_word = Word.readWordFromFile(f)      
+
 
 class FrequencyTable():
     def __init__(self):
@@ -370,18 +392,36 @@ class Board():
         """
 
         possible, message = self.isPossible(word,x,y,direction)
+        x_copy = x
+        y_copy = y
         if not possible:
             print(message)
-
         else:
             needed_letters = Word()
             for c in word.word:
-                if self.board[x][y] != c:
+                if self.board[x_copy][y_copy] != c:
                     needed_letters.word.append(c)
                 if direction == "V":
-                    x += 1
+                    x_copy += 1
                 elif direction == "H":
-                    y += 1
+                    y_copy += 1
             
-        return needed_letters
-        
+            return needed_letters
+
+    def showWordPlacement(self, pawns, word):
+        """
+        Dadas las fichas del jugador y una palabra, muestra las posibles colocaciones de la palabra
+        """
+        for i in range(len(self.board)):
+            for j in range(len(self.board)):
+                if self.isPossible(word, i, j, "V")[0] == True:
+                    needed_pawns = self.getPawns(word,i,j,"V")
+                    if FrequencyTable.isSubset(needed_pawns.getFrequency(), pawns.getFrequency()):
+                        print(i , "," , j , " en Vertical")
+                
+                if self.isPossible(word, i, j, "H")[0] == True:
+                    needed_pawns = self.getPawns(word,i,j,"H")
+                    if FrequencyTable.isSubset(needed_pawns.getFrequency(), pawns.getFrequency()):
+                        print(i , "," , j , "en Horizontal")
+
+          
