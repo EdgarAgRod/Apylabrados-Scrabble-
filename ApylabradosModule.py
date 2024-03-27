@@ -51,7 +51,7 @@ class Pawns():
 
         ft_pawns = self.getFrequency()
         ft_pawns.showFrequency()
-        
+
     def takeRandomPawn(self):
         """
         Saca una ficha de la bolsa y se la coloca al jugador
@@ -59,7 +59,7 @@ class Pawns():
         Outs:
             letter (str): Letra que se sacó
         """
-        i = np.random.randint(0, len(self.letters) - 1)
+        i = np.random.randint(0, self.getTotalPawns() - 1)
         letter = self.letters[i]
         self.letters.pop(i)
         return letter
@@ -77,6 +77,12 @@ class Pawns():
         for c in self.letters:
             ft.update(c)
         return ft
+
+    def takePawn(self, c):
+        self.letters.remove(c)
+
+    def getTotalPawns(self):
+        return len(self.letters)
 
 
 class Word():
@@ -156,33 +162,7 @@ class Word():
             ft.update(c)
 
         return ft
-
-
-
-    filepath = "/content/drive/MyDrive/Python - Udemy/Proyecto Final Apylabrados/dictionary.txt"
-
-    @staticmethod
-    def validateWord(given_word):
-        """
-        Valida si la palabra se encuentra en el diccionario
-
-        Ins:
-            given_word (Word obj): Palabra a checar
-        
-        Outs:
-            bool: Si está (T) o no (F) en el diccionario
-        """
-        with open(Dictionary.filepath, "r") as f:
-            dictionary_word = Word.readWordFromFile(f)
-            while not dictionary_word.isEmpty() and not given_word.areEqual(dictionary_word):
-                dictionary_word = Word.readWordFromFile(f)
-
-        if dictionary_word.isEmpty() and not dictionary_word.areEqual(given_word):
-            print("Esa palabra no esta en el diccionario.")
-            return False
-        else:
-            return True
-        
+    
 
 class Dictionary():
     filepath = "/content/drive/MyDrive/Python - Udemy/Proyecto Final Apylabrados/dictionary.txt"
@@ -214,7 +194,7 @@ class FrequencyTable():
     def __init__(self):
         self.letters = np.array(["A","B","C","D","E","F","G","H","I","J","K","L","M","N",
                         "O","P","Q","R","S","T","U","V","W","X","Y","Z"])
-        self.frequencies = np.zeros(len(self.letters))
+        self.frequencies = np.zeros(len(self.letters), dtype=int)
 
     def showFrequency(self):
         """
@@ -224,7 +204,7 @@ class FrequencyTable():
         for i in range(len(self.frequencies)):
             if self.frequencies[i] != 0:
                 print("{}: {}".format(self.letters[i], self.frequencies[i]))
-    
+
     @staticmethod
     def isSubset(ftable1, ftable2):
         """
@@ -240,7 +220,7 @@ class FrequencyTable():
         for i in range(len(ftable1.letters)):
             if ftable1.frequencies[i] <= ftable2.frequencies[i]:
                 continue;
-            else: 
+            else:
                 return False
         return True
 
@@ -251,13 +231,14 @@ class FrequencyTable():
         """
         self.frequencies[np.where(self.letters == c)[0]] += 1
 
+
 class Board():
     def __init__ (self):
         self.board = [[" " for j in range(15)] for i in range(15)]
         self.total_words = 0
         self.total_pawns = 0
 
-    def show_Board(self):
+    def showBoard(self):
         """
         Muestra el tablero
         """
@@ -274,6 +255,26 @@ class Board():
             print("| {}{}".format(0 if i <=9 else "", i))
         print("+---"*len(self.board)+ "+")
 
+    def placeWord(self, player_pawns, word, x, y, direction):
+        """
+        Coloca la palabra en el tablero, elimina y repone las fichas del jugador
+        """
+        for c in word.word:
+            if self.board[x][y] != c: 
+                self.board[x][y] =  c
+                player_pawns.takePawn(c)
+                self.total_pawns += 1
 
+            if direction == "V":
+                x += 1
+            elif direction == "H":
+                y += 1
+            
+        self.total_words += 1
+        
+        n_pawns_used = 7 - player_pawns.getTotalPawns()
+        for _ in range(n_pawns_used):
+            player_pawns.addPawn(bag_of_pawns.takeRandomPawn())
 
-
+        return player_pawns
+    
