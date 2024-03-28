@@ -1,0 +1,9 @@
+- Escribe el numero de la acción que quieras relizar:
+	"1" Para colocar una palabra
+	"2" Para palabras que se pueden formar con tus letras
+	"3" Para palabras que se pueden formar con tus letras y una letra del tablero específica
+	"4" Para conocer donde se puede colocar una palabra
+	"5" Para consultar tus fichas
+	"6" Para consultar tu puntaje
+	"7" Para consultar los puntos de cada ficha
+	"8" Para Salir del juego

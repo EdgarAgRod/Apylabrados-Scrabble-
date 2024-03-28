@@ -1,0 +1,10 @@
+Instrucciones:
+
+- Se te otorgará un total de 7 fichas, utilizalas para crear una palabra inicial que pase por el centro
+
+- Se te repondrán las fichas usadas, y debes crear mas palabras uniendolas siempre con una o más letras presentes en el tablero
+
+- Asegúrate de no pasarte de los límites del tablero, insertar una palabra valida en idioma ingles, y no sobreponer fichas
+
+================================================================================================================================
+

@@ -108,6 +108,7 @@ class Pawns():
             print("{}:{}{}".format(key," " if Pawns.getPoints(key)<=9 else "", Pawns.getPoints(key)), end = end)
             count += 1
             end = "\n" if count % 3 == 2 else "   "
+        print("\n")
 
 
 class Word():
@@ -215,7 +216,7 @@ class Dictionary():
                 dictionary_word = Word.readWordFromFile(f)
 
         if dictionary_word.isEmpty() and not dictionary_word.areEqual(given_word):
-            print("Esa palabra no esta en el diccionario.")
+            # print("Esa palabra no esta en el diccionario.\n")
             return False
         else:
             return True
@@ -252,7 +253,7 @@ class FrequencyTable():
         """
         Muestra la frecuencia de aparición de cada letra por palabra
         """
-        print("Frequencies:\n")
+        # print("Frequencies:\n")
         for i in range(len(self.frequencies)):
             if self.frequencies[i] != 0:
                 print("{}: {}".format(self.letters[i], self.frequencies[i]))
@@ -333,85 +334,91 @@ class Board():
         message = ""
         size = word.getLengthWord()
 
-        # Casilla Central
-        if self.total_words == 0:
-            message = "Ninguna ficha pasa por la casilla central"
-            
-            if direction == "H":
-                if x != 7:
-                    return (False, message)
-                elif 7 not in range(y,y+size):
-                    return (False, message)
-            
-            elif direction == "V":
-                if y != 7:
-                    return (False, message)
-                elif 7 not in range(x,x+size):
-                    return (False, message)
+        isInDictionary = Dictionary.validateWord(word)
+        message = "Esa palabra no esta en el diccionario\n"
 
-        else:
+        if isInDictionary:
+            # Casilla Central
+            if self.total_words == 0:
+                message = "Ninguna ficha pasa por la casilla central"
+                
+                if direction == "H":
+                    if x != 7:
+                        return (False, message)
+                    elif 7 not in range(y,y+size):
+                        return (False, message)
+                
+                elif direction == "V":
+                    if y != 7:
+                        return (False, message)
+                    elif 7 not in range(x,x+size):
+                        return (False, message)
 
-        # Límites del tablero
-            message = "La palabra se sale de los límites del tablero"
-            if x<0 or x>14 or y<0 or y>14:
-                return(False, message)
-            if direction == "V" and  x+size -1 > 14:
-                return(False, message)
-            if direction == "H" and  y+size-1 > 14:
-                return(False, message)
+            else:
 
-        # Ficha existente
-            message = "Debes usar una ficha existente"
-            if direction == "V":
-                for i in range(x, x+size):
-                    if self.board[i][y] != " ":
-                        break
-                else:
+            # Límites del tablero
+                message = "La palabra se sale de los límites del tablero"
+                if x<0 or x>14 or y<0 or y>14:
                     return(False, message)
-            if direction == "H":
-                for i in range(y, y+size):
-                    if self.board[x][i] != " ":
-                        break
-                else:
+                if direction == "V" and  x+size -1 > 14:
+                    return(False, message)
+                if direction == "H" and  y+size-1 > 14:
                     return(False, message)
 
-            # Casilla ocupada
-            x_copy = x
-            y_copy = y
-            for c in word.word:
-                if self.board[x_copy][y_copy] != " " and self.board[x_copy][y_copy] != c:
-                    message = "¡Ya hay una ficha distinta en una posicion que intentaste!"
+            # Ficha existente
+                message = "Debes usar una ficha existente"
+                if direction == "V":
+                    for i in range(x, x+size):
+                        if self.board[i][y] != " ":
+                            break
+                    else:
+                        return(False, message)
+                if direction == "H":
+                    for i in range(y, y+size):
+                        if self.board[x][i] != " ":
+                            break
+                    else:
+                        return(False, message)
+
+                # Casilla ocupada
+                x_copy = x
+                y_copy = y
+                for c in word.word:
+                    if self.board[x_copy][y_copy] != " " and self.board[x_copy][y_copy] != c:
+                        message = "¡Ya hay una ficha distinta en una posicion que intentaste!"
+                        return(False,message)
+                    if direction == "V":
+                        x_copy += 1
+                    elif direction == "H":
+                        y_copy += 1
+
+                # Nueva ficha
+                x_copy = x
+                y_copy = y
+                for c in word.word:
+                    if self.board[x_copy][y_copy] == " ":
+                        break;
+                    if direction == "V":
+                        x_copy += 1
+                    elif direction == "H":
+                        y_copy += 1
+                else: 
+                    message = "No has usado una nueva casilla"
                     return(False,message)
-                if direction == "V":
-                    x_copy += 1
-                elif direction == "H":
-                    y_copy += 1
-
-            # Nueva ficha
-            x_copy = x
-            y_copy = y
-            for c in word.word:
-                if self.board[x_copy][y_copy] == " ":
-                    break;
-                if direction == "V":
-                    x_copy += 1
-                elif direction == "H":
-                    y_copy += 1
-            else: 
-                message = "No has usado una nueva casilla"
-                return(False,message)
-            
-            # No arruinar otra palabra
-            message = "Hay fichas adicionales a principio o a final de palabra"
-            size_fixed = size-1
-            
-            if direction == "V" and ((x != 0 and self.board[x-1][y] != " ") or (x + size != 14 and self.board[x + size][y] != " ")):
-                return(False,message)
-            
-            if direction == "H" and ((y != 0 and self.board[x][y-1] != " ") or (y + size != 14 and self.board[x][y+size] != " ")):
-                return(False,message)
-        message = "Valido"
-        return (True, message)
+                
+                # No arruinar otra palabra
+                message = "Hay fichas adicionales a principio o a final de palabra"
+                size_fixed = size-1
+                
+                if direction == "V" and ((x != 0 and self.board[x-1][y] != " ") or (x + size != 14 and self.board[x + size][y] != " ")):
+                    return(False,message)
+                
+                if direction == "H" and ((y != 0 and self.board[x][y-1] != " ") or (y + size != 14 and self.board[x][y+size] != " ")):
+                    return(False,message)
+            message = "Valido"
+            return (True, message)
+        else:
+            return(False,message)
 
     def getPawns(self, word, x, y, direction):
         """
@@ -451,3 +458,116 @@ class Board():
                     if FrequencyTable.isSubset(needed_pawns.getFrequency(), pawns.getFrequency()):
                         print(i , "," , j , "en Horizontal")
                       
+
+def welcome():
+    path = "/content/drive/MyDrive/Python - Udemy/Proyecto Final Apylabrados/welcome_message.txt"
+    with open(path) as f:
+        print(f.read())
+
+
+def instructions():
+    path = "/content/drive/MyDrive/Python - Udemy/Proyecto Final Apylabrados/instructions_message.txt"
+    with open(path) as f:
+        print(f.read())
+
+
+def startGame():
+    # Inicializar variable end
+    global end 
+    end = False
+
+    # Crear Bolsa de Fichas
+    global bag_of_pawns
+    bag_of_pawns = Pawns()
+    bag_of_pawns.createBag()
+
+    # Crear fichas jugador
+    global player_pawns
+    player_pawns = Pawns()
+
+    # Crear Tablero
+    global board
+    board = Board()
+
+    # Dar Bienvenida 
+    welcome()
+    print("\n")
+
+    # Mostrar Instrucciones
+    instructions()
+    print("\n")
+
+
+def reponerFichas():
+    # Repartir y Mostrar fichas
+    while player_pawns.getTotalPawns() < 7:
+        player_pawns.addPawn(bag_of_pawns.takeRandomPawn())
+    print("\nEstas son tus fichas:")
+    player_pawns.showPawns()
+
+
+def endGame():
+    global end 
+    end = True
+    print("Has finalizado el juego\n")
+
+
+def options():
+    print ("\n", "-"*60)
+    path = "/content/drive/MyDrive/Python - Udemy/Proyecto Final Apylabrados/options_message.txt"
+    with open(path) as f:
+        print(f.read())
+    player_answer = input("\nIntroduce una accion: ")
+
+    if player_answer == "1":
+        # Insertar palabra
+        x = int(input("Introduce x: "))
+        y = int(input("Introduce y: "))
+        new_word = Word.readWord()
+        direction = input("Introduce la direccion (V o H): ")
+
+        isPossible = board.isPossible(new_word, x, y, direction)
+        needed_pawns = board.getPawns(new_word,x,y,direction)
+
+        if isPossible[0]:
+            if FrequencyTable.isSubset(needed_pawns.getFrequency(), player_pawns.getFrequency()):
+                board.placeWord(player_pawns,new_word,x,y,direction)
+                board.showBoard()
+
+                # Regresar fichas
+                n_pawns_used = 7 - player_pawns.getTotalPawns()
+                for _ in range(n_pawns_used):
+                    player_pawns.addPawn(bag_of_pawns.takeRandomPawn())
+
+            else:
+                print("No se puede, te faltan letras.")
+    
+    elif player_answer == "2": 
+        print("Las palabras que puedes hacer solo con tus fichas son:\n")
+        Dictionary.showWord(player_pawns)
+    
+    elif player_answer == "3":
+        c = input("Introduce la letra del tablero que quieres ocupar: ")
+        print("Las palabras que puedes hacer con tus fichas  y la letra",c,"son:\n")
+        Dictionary.showWordPlus(player_pawns, c)
+
+    elif player_answer == "4":
+        print("Introduce la palabra para decirte en donde puede colocarse \n")
+        test_word = Word.readWord()
+        board.showWordPlacement(player_pawns, test_word)
+    
+    # elif player_answer == "5":
+    #     reponerFichas()
+
+    elif player_answer == "6":
+        print("Tu puntaje es:", Board.score,"\n")
+
+
+    elif player_answer == "7":
+        print("Estos son los puntos que te da cada letra:\n")
+        Pawns.showPawnsPoints()
+    
+    elif player_answer == "8":
+        endGame()
+
+
